@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Navigate to the project directory
-cd /home/user/dropshipv2
+cd "C:/Users/Behee/Desktop/Dropship dbug/dropshipv2"
 
 # Activate virtual environment (if you're using one)
 # source /path/to/your/virtualenv/bin/activate
