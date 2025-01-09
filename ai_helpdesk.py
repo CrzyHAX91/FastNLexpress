@@ -42,7 +42,7 @@ class AdvancedAIHelpdesk:
         elif self.context:
             return self.handle_follow_up(prompt_lower, user_id)
         else:
-            return "I apologize, but I don't have specific information about that. Would you like me to connect you with a human customer service representative?"
+            return "I apologize, but I don't have specific information about that. Would you like me to connect you with a human customer service representative? You can also check our services through Cloudflare."
 
     def personalize_response(self, response, user_id):
         if user_id in self.user_profiles:

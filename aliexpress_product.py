@@ -23,7 +23,7 @@ def post_product(api_key, product_details):
             logger.error(f"Missing required field: {field}")
             raise ValueError(f"Missing required field: {field}")
 
-    url = "https://api.aliexpress.com/postproduct"
+    url = "https://your-cloudflare-protected-api.com/postproduct"  # Update to Cloudflare-protected endpoint
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json"
