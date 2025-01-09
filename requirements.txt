@@ -1,7 +1,9 @@
-Django==4.2.16
+Django==5.1.4
 django-allauth==65.3.0
 Pillow==11.0.0
 python-dotenv==1.0.1
-fuzzywuzzy==0.18.0  # Pinning version
-python-Levenshtein==0.12.2  # Pinning version
-textblob==0.15.3  # Pinning version
+aliexpress-api-python==1.0.0
+
+fuzzywuzzy
+python-Levenshtein
+textblob

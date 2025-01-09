@@ -1,4 +1,3 @@
-
 import os
 from aliexpress_api import AliexpressApi, AliexpressCategory
 from .models import Product
@@ -10,6 +9,7 @@ APP_SECRET = os.environ.get('ALIEXPRESS_APP_SECRET')
 api = AliexpressApi(APP_KEY, APP_SECRET)
 
 def sync_products():
+    """Fetch products from AliExpress API and update or create Product instances."""
     # Fetch products from AliExpress API
     products = api.get_product_list(
         fields="productId,productTitle,productUrl,imageUrl,salePrice",
@@ -18,10 +18,9 @@ def sync_products():
     )
 
     for product in products:
-        # Check if the product already exists in our database
-        existing_product = Product.objects.filter(aliexpress_url=product['productUrl']).first()
-
-        if existing_product:
+        if existing_product := Product.objects.filter(
+            aliexpress_url=product['productUrl']
+        ).first():
             # Update existing product
             existing_product.name = product['productTitle']
             existing_product.selling_price = float(product['salePrice']['amount'])
@@ -38,6 +37,7 @@ def sync_products():
             new_product.save()
 
 def place_order(order):
+    """Place an order on AliExpress based on the items in the order."""
     # This is a simplified example. In a real-world scenario, you'd need to handle
     # shipping addresses, payment confirmation, etc.
     for item in order.items.all():
@@ -58,3 +58,14 @@ def place_order(order):
             order.save()
             return True
     return False
+
+def get_product_details(product_id):
+    """Fetch product details from AliExpress API."""
+    product_details = api.get_product_details(product_id)
+    return product_details
+
+def search_products(keywords):
+    """Search for products on AliExpress based on keywords."""
+    products = api.search_products(keywords=keywords, page_size=20)
+    return products
+</write_to_file>
