@@ -18,7 +18,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt $APP_HOME/
 
 # Install Python dependencies
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Copy the rest of the project files into the container
 COPY . $APP_HOME/
@@ -32,4 +32,3 @@ EXPOSE 8000
 
 # Default command to run the application
 CMD ["python", "dropship_project/manage.py", "runserver", "0.0.0.0:8000"]
-
