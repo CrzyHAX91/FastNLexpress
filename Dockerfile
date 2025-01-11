@@ -1,35 +1,17 @@
-# Use an official Python runtime as the base image
-FROM python:3.9-slim AS base
-
-# Set environment variables for Python
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    APP_HOME=/app
+# Use the official Python image from the Docker Hub
+FROM python:3.9-slim
 
 # Set the working directory in the container
-WORKDIR $APP_HOME
+WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential libpq-dev && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+# Copy the requirements file into the container
+COPY requirements.txt .
 
-# Copy only requirements for better caching
-COPY requirements.txt $APP_HOME/
+# Install the dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Python dependencies
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# Copy the rest of the application code into the container
+COPY . .
 
-# Copy the rest of the project files into the container
-COPY . $APP_HOME/
-
-# Use a non-root user
-RUN adduser --disabled-password appuser && chown -R appuser $APP_HOME
-USER appuser
-
-# Expose the port (configurable)
-EXPOSE 8000
-
-# Default command to run the application
-CMD ["python", "dropship_project/manage.py", "runserver", "0.0.0.0:8000"]
-
+# Command to run the application
+CMD ["python", "run.py"]  # Adjust this command based on your entry point
