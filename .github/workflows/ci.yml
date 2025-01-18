@@ -40,6 +40,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install coverage  # Install coverage here
 
       # Set environment variables
       - name: Export Environment Variables
@@ -52,7 +53,6 @@ jobs:
       # Generate Coverage Report (optional)
       - name: Run Coverage
         run: |
-          pip install coverage
           coverage run --source='.' manage.py test
           coverage report
         if: always()
@@ -62,9 +62,9 @@ jobs:
         if: always()
         run: python -m pip cache purge
 
-      # Upload Coverage Report (optional)
+        # Upload Coverage Report (optional)
       - name: Upload Coverage Report
         if: always()
-        run: |
-          pip install coverage
-          coverage xml
+        run: coverage xml
+
+      
