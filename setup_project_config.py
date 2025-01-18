@@ -5,11 +5,11 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-your-secret-key-here'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-your-secret-key-here')
 
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -54,8 +54,12 @@ WSGI_APPLICATION = 'dropship_project.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_DB', 'dropship_db'),
+        'USER': os.environ.get('POSTGRES_USER', 'dropship_user'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'dropship_password'),
+        'HOST': 'db',
+        'PORT': '5432',
     }
 }
 
@@ -87,54 +91,11 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Stripe settings
-STRIPE_PUBLIC_KEY = 'your-stripe-public-key'
-STRIPE_SECRET_KEY = 'your-stripe-secret-key'
+STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY', 'your-stripe-public-key')
+STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', 'your-stripe-secret-key')
 '''
 
 with open('dropship_project/settings.py', 'w') as f:
     f.write(settings_content)
 
 print("Project settings created successfully.")
-
-# Create main urls.py
-main_urls_content = '''
-from django.contrib import admin
-from django.urls import path, include
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
-]
-'''
-
-with open('dropship_project/urls.py', 'w') as f:
-    f.write(main_urls_content)
-
-print("Main URL configuration created successfully.")
-
-# Create manage.py
-manage_content = '''
-#!/usr/bin/env python
-import os
-import sys
-
-def main():
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'dropship_project.settings')
-    try:
-        from django.core.management import execute_from_command_line
-    except ImportError as exc:
-        raise ImportError(
-            "Couldn't import Django. Are you sure it's installed and "
-            "available on your PYTHONPATH environment variable? Did you "
-            "forget to activate a virtual environment?"
-        ) from exc
-    execute_from_command_line(sys.argv)
-
-if __name__ == '__main__':
-    main()
-'''
-
-with open('manage.py', 'w') as f:
-    f.write(manage_content)
-
-print("manage.py created successfully.")

@@ -9,9 +9,11 @@ from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic import View
 
 def is_admin(user):
+    """Check if the user is an admin."""
     return user.is_staff or user.is_superuser
 
 class AdminRequiredMixin(UserPassesTestMixin):
+    """Mixin to require admin access for certain views."""
     def test_func(self):
         return self.request.user.is_staff or self.request.user.is_superuser
 
@@ -29,6 +31,7 @@ class ProductDetailView(View):
 
 @login_required
 def add_to_cart(request, product_id):
+    """Add a product to the user's cart."""
     product = get_object_or_404(Product, id=product_id)
     cart_item, created = CartItem.objects.get_or_create(user=request.user, product=product)
     if not created:
@@ -38,12 +41,14 @@ def add_to_cart(request, product_id):
 
 @login_required
 def cart(request):
+    """View the user's cart."""
     cart_items = CartItem.objects.filter(user=request.user).select_related('product')
     total = cart_items.aggregate(total=Sum(F('product__selling_price') * F('quantity')))['total'] or 0
     return render(request, 'cart.html', {'cart_items': cart_items, 'total': total})
 
 @login_required
 def checkout(request):
+    """Process the checkout for the user's cart."""
     cart_items = CartItem.objects.filter(user=request.user).select_related('product')
     total = cart_items.aggregate(total=Sum(F('product__selling_price') * F('quantity')))['total'] or 0
     if request.method == 'POST':
@@ -59,10 +64,12 @@ def checkout(request):
 
 @login_required
 def order_confirmation(request, order_id):
+    """Confirm the user's order."""
     order = get_object_or_404(Order, id=order_id, user=request.user)
     return render(request, 'order_confirmation.html', {'order': order})
 
 class AdminDashboardView(AdminRequiredMixin, View):
+    """View for the admin dashboard."""
     def get(self, request):
         recent_orders = Order.objects.all().order_by('-created_at')[:10]
         total_sales = Order.objects.aggregate(total=Sum('total_price'))['total'] or 0
@@ -72,11 +79,13 @@ class AdminDashboardView(AdminRequiredMixin, View):
         })
 
 class SyncAliexpressProductsView(AdminRequiredMixin, View):
+    """View to sync products from AliExpress."""
     def post(self, request):
         sync_products()
         return JsonResponse({'status': 'success', 'message': 'Products synced successfully'})
 
 class HelpdeskView(View):
+    """View for the helpdesk."""
     def get(self, request):
         return render(request, 'helpdesk.html')
 
@@ -85,6 +94,9 @@ class HelpdeskView(View):
         response = generate_response(user_query)  # Placeholder for AI response generation
         return JsonResponse({'response': response})
 
+# The `generate_response(query)` function is a placeholder function that generates a response for user
+# queries in the HelpdeskView. It takes a user query as input and returns a response string. In this
+# case, it simply appends the user's query to a placeholder response string.
 def generate_response(query):
     # Placeholder function for generating AI responses
     return "This is a placeholder response for your query: " + query

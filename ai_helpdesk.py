@@ -2,6 +2,7 @@ import re
 from fuzzywuzzy import fuzz
 import random
 from textblob import TextBlob
+import json
 
 class AdvancedAIHelpdesk:
     def __init__(self):
@@ -11,19 +12,15 @@ class AdvancedAIHelpdesk:
         self.knowledge_base = self.load_knowledge_base()
     
     def load_knowledge_base(self):
-        # Placeholder for loading a more comprehensive knowledge base
-        return {
-            "track|tracking|find|locate order": "To track your order, please follow these steps:\n1. Log in to your account on our website.\n2. Go to the 'Order History' section.\n3. Find your order and click on 'Track Order'.\n4. You'll see the current status and estimated delivery date of your order.",
-            "delay|delayed|late order": "If your order is delayed, please follow these steps:\n1. Check your order status on our website.\n2. If it's been more than 7 days past the estimated delivery date, please contact our customer support team.\n3. Provide your order number when contacting us for faster assistance.",
-            "cancel|cancellation|stop order": "To cancel your order:\n1. Log in to your account on our website.\n2. Go to 'Order History' and find the order you want to cancel.\n3. If the order hasn't been shipped yet, you should see a 'Cancel Order' button.\n4. Click the button and confirm the cancellation.\n5. If you don't see the cancel button, the order may have already been shipped. In this case, please contact our customer support team for assistance.",
-            "return policy|returns|refund": "Our return policy allows returns within 30 days of receiving your order. Please ensure the item is unused and in its original packaging. To initiate a return, log in to your account and go to the 'Returns' section.",
-            "shipping time|delivery time|how long|when will I receive": "Shipping times vary depending on your location and the shipping method chosen. Typically, orders are processed within 1-2 business days, and shipping can take 3-7 business days for standard shipping, or 1-3 business days for express shipping.",
-            "international shipping|ship to other countries": "Yes, we offer international shipping to many countries. Shipping costs and delivery times may vary depending on the destination. Please check our shipping information page or contact customer support for specific details about shipping to your country.",
-            "payment methods|how to pay": "We accept various payment methods including credit/debit cards (Visa, MasterCard, American Express), PayPal, and Apple Pay. You can select your preferred payment method during checkout.",
-            "size guide|sizing": "You can find our size guide on the product page of each item. Click on the 'Size Guide' link to view detailed measurements and find the best fit for you.",
-            "product availability|in stock": "Product availability is shown on each item's page. If an item is out of stock, you can sign up for email notifications to be alerted when it's back in stock.",
-            "discount|coupon|promo code": "To use a discount or promo code, enter it in the designated field during checkout. Make sure to check the terms and conditions of the coupon, as some may have restrictions or expiration dates."
-        }
+        try:
+            with open('knowledge_base.json', 'r') as file:
+                return json.load(file)
+        except FileNotFoundError:
+            print("Knowledge base file not found. Please ensure it exists.")
+            return {}
+        except json.JSONDecodeError:
+            print("Error decoding the knowledge base JSON file. Please check the file format.")
+            return {}
 
     def generate_response(self, prompt, user_id):
         prompt_lower = prompt.lower()
@@ -37,7 +34,7 @@ class AdvancedAIHelpdesk:
                     best_score = score
                     best_match = response
 
-        if best_score >= 80:
+        if best_score >= 70:  # Adjusted threshold
             self.context.append(prompt)
             response = self.personalize_response(best_match, user_id)
             follow_up = self.generate_follow_up(prompt_lower)
@@ -45,7 +42,7 @@ class AdvancedAIHelpdesk:
         elif self.context:
             return self.handle_follow_up(prompt_lower, user_id)
         else:
-            return "I apologize, but I don't have specific information about that. Would you like me to connect you with a human customer service representative?"
+            return "I apologize, but I don't have specific information about that. Would you like me to connect you with a human customer service representative? You can also check our services through Cloudflare."
 
     def personalize_response(self, response, user_id):
         if user_id in self.user_profiles:
@@ -84,7 +81,7 @@ class AdvancedAIHelpdesk:
 
     def analyze_sentiment(self, prompt):
         analysis = TextBlob(prompt)
-        if analysis.sentiment.polarity < -0.3:  # Lowered threshold
+        if analysis.sentiment.polarity < -0.2:  # Adjusted threshold
             return "I apologize for any inconvenience. Would you like me to connect you with a human customer service representative?"
         return None
 
