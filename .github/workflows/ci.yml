@@ -62,9 +62,15 @@ jobs:
         if: always()
         run: python -m pip cache purge
 
-        # Upload Coverage Report (optional)
-      - name: Upload Coverage Report
+        # Upload Coverage Report to Codecov
+      - name: Upload Coverage to Codecov
         if: always()
-        run: coverage xml
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
+          verbose: true
+
+
 
       
