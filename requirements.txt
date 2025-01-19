@@ -6,3 +6,5 @@ python-dotenv==1.0.1
 fuzzywuzzy
 python-Levenshtein
 textblob
+spacy
+transformers
