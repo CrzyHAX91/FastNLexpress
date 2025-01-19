@@ -71,6 +71,8 @@ jobs:
           fail_ci_if_error: false
           verbose: true
 
-
-
-      
+      # Check Code Quality
+      - name: Check Code Quality
+        run: |
+          pip install flake8
+          flake8 .

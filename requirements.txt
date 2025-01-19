@@ -8,3 +8,4 @@ python-Levenshtein
 textblob
 spacy
 transformers
+flake8
