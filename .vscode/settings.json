@@ -3,8 +3,9 @@
     "python.analysis.autoImportCompletions": true,
     "cmake.useCMakePresets": "always",
     "cSpell.words": [
-        "aliexpress"
+        "aliexpress",
+        "Behee"
     ],
-    "CodeGPT.apiKey": "CodeGPT Plus Beta",
+    "CodeGPT.apiKey": "CodeGPT Plus",
     "python.analysis.userFileIndexingLimit": -1
 }
