@@ -17,7 +17,7 @@ jobs:
     steps:
       # Checkout the code
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Set up Python
       - name: Set up Python ${{ matrix.python-version }}
@@ -70,7 +70,3 @@ jobs:
           files: ./coverage.xml
           fail_ci_if_error: false
           verbose: true
-
-
-
-      

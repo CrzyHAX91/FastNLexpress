@@ -15,8 +15,7 @@ Follow the instructions in the `SETUP.md` file to set up the development environ
 
 ## Contributing
 
-We welcome contributions! Please refer to the `CONTRIBUTING.md` file for guidelines.
-
+We welcome contributions! Please refer to the `CONTRIBUTING.md` file for guidelines. Ensure you are using `actions/checkout@v4` in your workflows.
 ## License
 
 This project is licensed under the MIT License.
