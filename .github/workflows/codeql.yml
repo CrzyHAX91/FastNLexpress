@@ -9,6 +9,7 @@
 # the `language` matrix defined below to confirm you have the correct set of
 # supported CodeQL languages.
 #
+name: CodeQL Analysis and Tests
 
 on:
   push:
@@ -16,11 +17,11 @@ on:
   pull_request:
     branches: [master, main]
   schedule:
-    - cron: '0 0 * * 1'
+    - cron: '0 * * * *'
 
 jobs:
   analyze:
-    name: Analyze
+    name: CodeQL Analysis
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -39,8 +40,24 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install django
-        # Add other dependencies here
+        pip install django pytest pytest-cov flake8
+        # Voeg hier meer dependencies toe
+
+    - name: Run tests with coverage
+      run: |
+        pytest --cov=./ --cov-report=xml
+        # Dit genereert een coverage-rapport in XML-formaat
+
+    - name: Lint code with flake8
+      run: flake8 .
+    
+    - name: Upload coverage report to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: code-coverage
+        fail_ci_if_error: true
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
@@ -50,8 +67,29 @@ jobs:
     - name: Autobuild
       run: |
         if [[ "${{ matrix.language }}" == "python" ]]; then
-          python setup.py install
+          python setup.py install || echo "No setup.py found"
         fi
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
+
+  notify:
+    name: Notify on Slack
+    runs-on: ubuntu-latest
+    if: ${{ failure() || success() }} # Voer notificatie uit ongeacht succes of falen
+
+    steps:
+    - name: Send Slack Notification
+      uses: slackapi/slack-github-action@v1.23.0
+      with:
+        slack-token: ${{ secrets.SLACK_BOT_TOKEN }}
+        channel-id: C12345678
+        text: |
+          Workflow *${{ github.workflow }}* op *${{ github.ref_name }}* is afgerond!
+          Status: *${{ job.status }}*
+          Bekijk de resultaten hier: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+
+
+
+    
