@@ -1,0 +1,16 @@
+{
+  "name": "fastnlexpress",
+  "version": "1.0.0",
+  "description": "A project for FastNLexpress",
+  "main": "index.js",
+  "scripts": {
+    "eslint": "eslint ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^8.56.0",
+    "@microsoft/eslint-formatter-sarif": "^3.0.0",
+    "eslint-define-config": "^1.0.0"
+  },
+  "type": "module"
+}

@@ -1,9 +1,9 @@
 Django==5.1.5
 django-allauth==65.3.1
-cloudflare
+cloudflare==3.0.0  # Example version, please verify
 Pillow==11.1.0
 python-dotenv==1.0.1
 aliexpress-api-python==1.0.0
-fuzzywuzzy
-python-Levenshtein
-textblob
+fuzzywuzzy==0.18.0  # Example version, please verify
+python-Levenshtein==0.12.0  # Example version, please verify
+textblob==0.15.3  # Example version, please verify
