@@ -87,5 +87,5 @@ class HelpdeskView(View):
 
 def generate_response(query):
     # Placeholder function for generating AI responses
-    return "This is a placeholder response for your query: " + query
+    return f"This is a placeholder response for your query: {query}"
 </write_to_file>
