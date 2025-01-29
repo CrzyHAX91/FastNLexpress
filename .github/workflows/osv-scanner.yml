@@ -1,6 +1,9 @@
 name: OSV-Scanner Workflow
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
@@ -8,10 +11,7 @@ on:
     branches:
       - main
   schedule:
-    - cron: '38 6 * * 6'
-  push:
-    branches:
-      - main
+    - cron: '38 6 * * 6' # Runs every Saturday at 06:38 UTC
 
 permissions:
   security-events: write
@@ -19,15 +19,25 @@ permissions:
 
 jobs:
   scan:
+    name: OSV Vulnerability Scan
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set Up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
+
+      - name: Cache Python Dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
       - name: Install OSV Scanner
         run: |
@@ -38,3 +48,7 @@ jobs:
         run: |
           echo "Running OSV Scanner..."
           osv-scanner --all
+
+      - name: Clean Up Pip Cache
+        run: python -m pip cache purge
+        if: always()
