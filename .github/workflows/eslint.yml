@@ -6,19 +6,21 @@ on:
   pull_request:
     branches: [ "master", "main" ]
   schedule:
-    - cron: '18 13 * * 5'
+    - cron: '18 13 * * 5' # Elke vrijdag om 13:18 UTC
 
 jobs:
   eslint:
-    name: Run eslint scanning
+    name: Run ESLint scanning
     runs-on: ubuntu-latest
+
     permissions:
       contents: read
       security-events: write
       actions: read
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # Gebruik de nieuwste versie
 
       - name: Cache node modules
         uses: actions/cache@v3
@@ -30,23 +32,23 @@ jobs:
 
       - name: Install ESLint
         run: |
-          npm install eslint@8.56.0
-          npm install @microsoft/eslint-formatter-sarif@3.0.0
-
-          npm install @microsoft/eslint-formatter-sarif@3.0.0
+          npm ci # Zorgt voor een schone installatie volgens package-lock.json
+          npm install eslint@8.56.0 @microsoft/eslint-formatter-sarif@3.0.0
 
       - name: Run ESLint
         env:
           SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
-        run: npx eslint .
-          --config .eslintrc.js
-          --ext .js,.jsx,.ts,.tsx
-          --format @microsoft/eslint-formatter-sarif
-          --output-file eslint-results.sarif
+        run: |
+          npx eslint . \
+            --config .eslintrc.js \
+            --ext .js,.jsx,.ts,.tsx \
+            --format @microsoft/eslint-formatter-sarif \
+            --output-file eslint-results.sarif
         continue-on-error: true
 
-      - name: Upload analysis results to GitHub
+      - name: Upload ESLint analysis results to GitHub
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: eslint-results.sarif
           wait-for-processing: true
+
