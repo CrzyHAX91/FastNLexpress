@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -57,6 +57,7 @@ jobs:
           files: ./coverage.xml
           fail_ci_if_error: false
           verbose: true
+          
         if: always()
 
       - name: Lint Code with Flake8
@@ -65,6 +66,4 @@ jobs:
       - name: Cleanup Pip Cache
         run: python -m pip cache purge
         if: always()
-
-
 
