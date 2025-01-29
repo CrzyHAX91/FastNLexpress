@@ -61,8 +61,7 @@ def place_order(order):
 
 def get_product_details(product_id):
     """Fetch product details from AliExpress API."""
-    product_details = api.get_product_details(product_id)
-    return product_details
+    return api.get_product_details(product_id)
 
 def search_products(keywords):
     """Search for products on AliExpress based on keywords."""
