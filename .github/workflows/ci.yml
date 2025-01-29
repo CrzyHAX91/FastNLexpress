@@ -6,19 +6,24 @@ on:
   pull_request:
     branches: [ master, main ]
 
+permissions:
+  contents: read
+
 jobs:
   build:
-    runs-on: ubuntu-latest
-
     strategy:
+      fail-fast: false
       matrix:
         python-version: ['3.9-slim', '3.10-slim', '3.11-slim']
+        ubuntu-version: ['ubuntu-20.04', 'ubuntu-22.04', 'ubuntu-latest']
+
+    runs-on: ${{ matrix.ubuntu-version }}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
@@ -35,7 +40,7 @@ jobs:
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install coverage flake8
 
       - name: Set Environment Variables
@@ -57,7 +62,6 @@ jobs:
           files: ./coverage.xml
           fail_ci_if_error: false
           verbose: true
-          
         if: always()
 
       - name: Lint Code with Flake8
@@ -66,4 +70,5 @@ jobs:
       - name: Cleanup Pip Cache
         run: python -m pip cache purge
         if: always()
+
 
