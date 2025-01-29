@@ -12,21 +12,18 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10'] # Test against multiple Python versions
+        python-version: ['3.9-slim', '3.10-slim', '3.11-slim']
 
     steps:
-      # Checkout the code
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Set up Python
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
-      # Cache pip dependencies
-      - name: Cache Python Dependencies
+      - name: Cache Dependencies
         uses: actions/cache@v3
         with:
           path: ~/.cache/pip
@@ -35,44 +32,39 @@ jobs:
             ${{ runner.os }}-pip-${{ matrix.python-version }}-
             ${{ runner.os }}-pip-
 
-      # Install dependencies
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install coverage  # Install coverage here
+          pip install coverage flake8
 
-      # Set environment variables
-      - name: Export Environment Variables
+      - name: Set Environment Variables
         run: echo "DJANGO_SETTINGS_MODULE=dropship_project.settings" >> $GITHUB_ENV
 
-      # Run Tests
       - name: Run Tests
         run: python manage.py test
 
-      # Generate Coverage Report (optional)
-      - name: Run Coverage
+      - name: Generate Coverage Report
         run: |
           coverage run --source='.' manage.py test
           coverage report
+          coverage xml -o coverage.xml
         if: always()
 
-      # Clean up pip cache
-      - name: Cleanup Cache
-        if: always()
-        run: python -m pip cache purge
-
-        # Upload Coverage Report to Codecov
       - name: Upload Coverage to Codecov
-        if: always()
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
           fail_ci_if_error: false
           verbose: true
+        if: always()
 
-      # Check Code Quality
-      - name: Check Code Quality
-        run: |
-          pip install flake8
-          flake8 .
+      - name: Lint Code with Flake8
+        run: flake8 .
+
+      - name: Cleanup Pip Cache
+        run: python -m pip cache purge
+        if: always()
+
+
+
