@@ -104,8 +104,7 @@ if __name__ == "__main__":
     ]
 
     for prompt in test_prompts:
-        sentiment_response = helpdesk.analyze_sentiment(prompt)
-        if sentiment_response:
+        if sentiment_response := helpdesk.analyze_sentiment(prompt):
             print(f"Prompt: {prompt}")
             print(f"Response: {sentiment_response}")
         else:
