@@ -108,9 +108,8 @@ class AdvancedAIHelpdesk:
             response = requests.get(f"https://api.example.com/info?query={query}")
             if response.status_code == 200:
                 return response.json()
-            else:
-                self.logger.error(f"Error fetching real-time info: {response.status_code} - {response.text}")
-                return "I'm sorry, I couldn't fetch the real-time information you requested."
+            self.logger.error(f"Error fetching real-time info: {response.status_code} - {response.text}")
+            return "I'm sorry, I couldn't fetch the real-time information you requested."
         except Exception as e:
             self.logger.error(f"Exception occurred while fetching real-time info: {e}")
             return "I'm sorry, I couldn't fetch the real-time information you requested."
