@@ -45,9 +45,9 @@ class AdvancedAIHelpdesk:
             return "I apologize, but I don't have specific information about that. Would you like me to connect you with a human customer service representative? You can also check our services through Cloudflare."
 
     def personalize_response(self, response, user_id):
-        if user_id in self.user_profiles:
-            if "shipping" in response.lower() and "location" in self.user_profiles[user_id]:
-                response += f"\n\nBased on your location in {self.user_profiles[user_id]['location']}, shipping might take an additional 1-2 days."
+        if user_id in self.user_profiles and ("shipping" in response.lower() and "location" in self.user_profiles[user_id]):
+            response += f"\n\nBased on your location in {self.user_profiles[user_id]['location']}, shipping might take an additional 1-2 days."
+
         return response
 
     def generate_follow_up(self, prompt):
