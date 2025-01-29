@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from integrations.aliexpress_integration import place_aliexpress_order
+from .aliexpress_integration import place_aliexpress_order
 
 class CustomUser(AbstractUser):
     """Custom user model extending the default AbstractUser."""
@@ -64,3 +64,4 @@ class Order(models.Model):
         self.status = 'processing'
         self.save()
         return True
+</write_to_file>

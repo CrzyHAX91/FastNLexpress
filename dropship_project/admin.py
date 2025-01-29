@@ -1,6 +1,6 @@
 from django.contrib import admin, messages
 from .models import CustomUser, Product, CartItem, Order
-from .aliexpress_integration import sync_products
+from integrations.aliexpress_integration import sync_products
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
@@ -39,9 +39,11 @@ class OrderAdmin(admin.ModelAdmin):
     actions = ['process_orders']
 
     def has_add_permission(self, request):
+        """Disable add permission for orders."""
         return False
 
     def has_delete_permission(self, request, obj=None):
+        """Disable delete permission for orders."""
         return False
 
     def process_orders(self, request, queryset):
