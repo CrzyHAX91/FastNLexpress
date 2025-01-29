@@ -6,46 +6,57 @@ on:
   pull_request:
     branches: [ "master" ]
 
+permissions:
+  contents: read
+
 jobs:
   build:
-    runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       max-parallel: 4
       matrix:
         python-version: [3.10, 3.11]
+        ubuntu-version: [ "ubuntu-20.04", "ubuntu-22.04", "ubuntu-latest" ]
+
+    runs-on: ${{ matrix.ubuntu-version }}
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Cache Python packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}-${{ runner.arch }}
-        restore-keys: |
-          ${{ runner.os }}-pip-${{ runner.arch }}-
-          ${{ runner.os }}-pip-
+      - name: Cache Python packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ runner.arch }}-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ runner.arch }}-
+            ${{ runner.os }}-pip-
 
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; else echo "No requirements.txt found, skipping..."; fi
 
-    - name: Run Django Migrations
-      run: |
-        python manage.py migrate
+      - name: Run Django Migrations
+        run: |
+          python manage.py migrate
 
-    - name: Run Tests
-      run: |
-        python manage.py test
+      - name: Run Tests
+        run: |
+          python manage.py test
 
-    - name: Check Code Style
-      run: |
-        pip install flake8
-        flake8 
+      - name: Check Code Style with Flake8
+        run: |
+          pip install flake8
+          flake8 .
+
+      - name: Cleanup Pip Cache
+        run: python -m pip cache purge
+        if: always()
+
