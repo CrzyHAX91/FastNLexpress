@@ -66,5 +66,4 @@ def get_product_details(product_id):
 
 def search_products(keywords):
     """Search for products on AliExpress based on keywords."""
-    products = api.search_products(keywords=keywords, page_size=20)
-    return products
+    return api.search_products(keywords=keywords, page_size=20)
