@@ -12,14 +12,14 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10'] # Test against multiple Python versions
+        python-version: ['3.9-slim', '3.10-slim', '3.11-slim'] # Gebruik de slim-versies van Python
 
     steps:
-      # Checkout the code
+      # Checkout de repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Set up Python
+      # Set up Python met slim-versie
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -35,44 +35,44 @@ jobs:
             ${{ runner.os }}-pip-${{ matrix.python-version }}-
             ${{ runner.os }}-pip-
 
-      # Install dependencies
+      # Installeer afhankelijkheden
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install coverage  # Install coverage here
+          pip install coverage flake8  # Installeer coverage & flake8
 
-      # Set environment variables
+      # Stel omgeving variabelen in
       - name: Export Environment Variables
         run: echo "DJANGO_SETTINGS_MODULE=dropship_project.settings" >> $GITHUB_ENV
 
-      # Run Tests
+      # Voer tests uit
       - name: Run Tests
         run: python manage.py test
 
-      # Generate Coverage Report (optional)
+      # Genereer Coverage Report
       - name: Run Coverage
         run: |
           coverage run --source='.' manage.py test
           coverage report
+          coverage xml -o coverage.xml
         if: always()
 
-      # Clean up pip cache
-      - name: Cleanup Cache
-        if: always()
-        run: python -m pip cache purge
-
-        # Upload Coverage Report to Codecov
+      # Upload Coverage Report naar Codecov
       - name: Upload Coverage to Codecov
-        if: always()
         uses: codecov/codecov-action@v3
         with:
           files: ./coverage.xml
           fail_ci_if_error: false
           verbose: true
+        if: always()
 
-      # Check Code Quality
-      - name: Check Code Quality
-        run: |
-          pip install flake8
-          flake8 .
+      # Controleer codekwaliteit met flake8
+      - name: Lint with flake8
+        run: flake8 .
+
+      # Opruimen van pip-cache
+      - name: Cleanup Cache
+        run: python -m pip cache purge
+        if: always()
+
