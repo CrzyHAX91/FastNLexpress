@@ -50,8 +50,7 @@ def checkout(request):
         order = Order.objects.create(user=request.user, total_price=total)
         order.items.set(cart_items)
         cart_items.delete()
-        success = order.process_order()
-        if success:
+        if success := order.process_order():
             return redirect('order_confirmation', order_id=order.id)
         else:
             return render(request, 'order_failed.html', {'order': order})
