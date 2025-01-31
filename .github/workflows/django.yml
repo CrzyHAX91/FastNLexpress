@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        python-version: ["3.9","3.10","3.11"]  # Ensures the latest stable Python 3 version is used.
+        python-version: ["3.9","3.10","3.11"]  # Testing from Python 3.9 (minimum supported) through current stable versions
         ubuntu-version: ["ubuntu-latest"]  # Always uses the latest stable Ubuntu version.
 
     runs-on: ${{ matrix.ubuntu-version }}
