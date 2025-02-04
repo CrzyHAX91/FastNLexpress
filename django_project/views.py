@@ -7,6 +7,8 @@ from .aliexpress_integration import sync_products
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.views.generic import View
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 
 def is_admin(user):
     return user.is_staff or user.is_superuser
@@ -47,13 +49,20 @@ def checkout(request):
     cart_items = CartItem.objects.filter(user=request.user).select_related('product')
     total = cart_items.aggregate(total=Sum(F('product__selling_price') * F('quantity')))['total'] or 0
     if request.method == 'POST':
-        order = Order.objects.create(user=request.user, total_price=total)
-        order.items.set(cart_items)
-        cart_items.delete()
-        if success := order.process_order():
-            return redirect('order_confirmation', order_id=order.id)
-        else:
-            return render(request, 'order_failed.html', {'order': order})
+        try:
+            # Validate user inputs
+            for item in cart_items:
+                if item.quantity <= 0:
+                    raise ValidationError("Invalid quantity for product: {}".format(item.product.name))
+            order = Order.objects.create(user=request.user, total_price=total)
+            order.items.set(cart_items)
+            cart_items.delete()
+            if success := order.process_order():
+                return redirect('order_confirmation', order_id=order.id)
+            else:
+                return render(request, 'order_failed.html', {'order': order})
+        except ValidationError as e:
+            return render(request, 'checkout.html', {'cart_items': cart_items, 'total': total, 'error': str(e)})
     return render(request, 'checkout.html', {'cart_items': cart_items, 'total': total})
 
 @login_required
@@ -81,10 +90,11 @@ class HelpdeskView(View):
 
     def post(self, request):
         user_query = request.POST.get('query', '')
+        if not user_query:
+            return JsonResponse({'error': 'Query cannot be empty'}, status=400)
         response = generate_response(user_query)  # Placeholder for AI response generation
         return JsonResponse({'response': response})
 
 def generate_response(query):
     # Placeholder function for generating AI responses
     return f"This is a placeholder response for your query: {query}"
-</write_to_file>
