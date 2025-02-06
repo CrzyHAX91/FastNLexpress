@@ -1,4 +1,3 @@
-
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.contrib.auth import views as auth_views
@@ -9,6 +8,8 @@ from .core import views as core_views
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 
 router = DefaultRouter()
 router.register(r'products', ProductViewSet)
@@ -26,6 +27,12 @@ schema_view = get_schema_view(
    public=True,
    permission_classes=(permissions.AllowAny,),
 )
+
+def validate_user_input(input_data):
+    try:
+        validate_email(input_data)
+    except ValidationError:
+        raise ValidationError("Invalid input data")
 
 urlpatterns = [
     path('jet/', include('jet.urls', 'jet')),  # Django JET URLS
