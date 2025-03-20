@@ -3,6 +3,8 @@ from django.urls import reverse
 from django.utils.html import format_html
 from django.contrib.admin.widgets import AdminDateWidget
 from django.forms.widgets import Media, MEDIA_TYPES
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 
 class QuickLinksWidget:
     title = _('Quick Links')
@@ -55,3 +57,9 @@ class SalesStatisticsWidget:
             'month_sales': Order.objects.filter(created_at__date__gte=this_month).aggregate(total=Sum('total_price'))['total'] or 0,
         }
 
+def validate_url(url):
+    validator = URLValidator()
+    try:
+        validator(url)
+    except ValidationError:
+        raise ValidationError("Invalid URL")

@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from .aliexpress_integration import place_aliexpress_order
 
 class CustomUser(AbstractUser):
@@ -7,6 +9,16 @@ class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     date_of_birth = models.DateField(blank=True, null=True)
+
+    def clean(self):
+        """Validate user inputs."""
+        if self.phone_number and not self.phone_number.isdigit():
+            raise ValidationError("Phone number must contain only digits.")
+        if self.email:
+            try:
+                validate_email(self.email)
+            except ValidationError:
+                raise ValidationError("Invalid email address.")
 
 class Product(models.Model):
     """Model representing a product in the store."""
@@ -64,4 +76,10 @@ class Order(models.Model):
         self.status = 'processing'
         self.save()
         return True
-</write_to_file>
+
+    def clean(self):
+        """Validate order inputs."""
+        if self.total_price <= 0:
+            raise ValidationError("Total price must be greater than zero.")
+        if not self.items.exists():
+            raise ValidationError("Order must contain at least one item.")
